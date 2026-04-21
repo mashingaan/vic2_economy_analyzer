@@ -13,6 +13,7 @@ import javafx.stage.DirectoryChooser;
 import javafx.stage.FileChooser;
 
 import java.io.File;
+import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
@@ -40,7 +41,18 @@ public class FilePrompt extends HBox {
         label.setPrefWidth(100.);
 
         labelWidth.addListener((observable, oldValue, newValue) -> label.setPrefWidth((Double) newValue));
-        pathField.textProperty().addListener((observable, oldValue, newValue) -> path = newValue == null ? null : Paths.get(newValue));
+        pathField.textProperty().addListener((observable, oldValue, newValue) -> {
+            if (newValue == null || newValue.trim().isEmpty()) {
+                path = null;
+                return;
+            }
+
+            try {
+                path = Paths.get(newValue.trim());
+            } catch (InvalidPathException e) {
+                path = null;
+            }
+        });
     }
 
     public FilePrompt(FilePromptType promptType, String labelText) {
@@ -76,12 +88,16 @@ public class FilePrompt extends HBox {
 
     @Deprecated
     public void setPath(String path) {
-        setPath(Paths.get(path));
+        if (path == null || path.trim().isEmpty()) {
+            setPath((Path) null);
+            return;
+        }
+        setPath(Paths.get(path.trim()));
     }
 
     public void setPath(Path path) {
         this.path = path;
-        this.pathField.setText(path.toString());
+        this.pathField.setText(path == null ? "" : path.toString());
     }
 
     public EventHandler<? super MouseEvent> getOnButtonClicked() {
@@ -105,7 +121,9 @@ public class FilePrompt extends HBox {
                     if (!pathField.getText().isEmpty()) {
                         //initialFile
                         File initialFile = new File(pathField.getText()).getParentFile();
-                        chooser.setInitialDirectory(initialFile);
+                        if (initialFile != null && initialFile.exists()) {
+                            chooser.setInitialDirectory(initialFile);
+                        }
                     }
 
                     file = chooser.showDialog(null);
@@ -114,15 +132,19 @@ public class FilePrompt extends HBox {
                     if (!pathField.getText().isEmpty()) {
                         //initialFile
                         File initialFile = new File(pathField.getText()).getParentFile();
-                        chooser.setInitialDirectory(initialFile);
+                        if (initialFile != null && initialFile.exists()) {
+                            chooser.setInitialDirectory(initialFile);
+                        }
                     }
 
                     file = chooser.showOpenDialog(null);
                 }
 
-                setPath(file.toPath());
+                if (file != null) {
+                    setPath(file.toPath());
+                }
 
-            } catch (NullPointerException ignored) {
+            } catch (IllegalArgumentException ignored) {
             }
         });
     }

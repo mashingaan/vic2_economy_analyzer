@@ -26,6 +26,9 @@ public class ReportHelpers {
      * Half finished, will probably not be completed.
      */
     static List<File> getLocalisationFiles(String path) {
+        if (path == null || path.trim().isEmpty()) {
+            return Collections.emptyList();
+        }
 
         /*String [] unwanted = {"darkness.csv", "1.1.csv", "1.3.csv", "1.4.csv", "beta1.csv", "beta3.csv", "darkness_3_02.csv",
                 "darkness_3_03.csv",
@@ -39,7 +42,14 @@ public class ReportHelpers {
 
         //the correct platform independent way to join paths
         File folder = Paths.get(path, "localisation").toFile();
+        if (!folder.isDirectory()) {
+            return Collections.emptyList();
+        }
+
         File[] files = folder.listFiles((File file) -> file.isFile() && file.getName().toLowerCase().endsWith(".csv"));
+        if (files == null || files.length == 0) {
+            return Collections.emptyList();
+        }
 
         return new ArrayList<>(Arrays.asList(files));
     }
@@ -51,6 +61,12 @@ public class ReportHelpers {
      * @return if goods.txt is found and read
      */
     static Set<Product> readProducts(String path) {
+        Set<Product> products = new TreeSet<>();
+
+        if (path == null || path.trim().isEmpty()) {
+            return products;
+        }
+
         String[] productTypes = {
                 "military_goods",
                 "raw_material_goods",
@@ -59,7 +75,10 @@ public class ReportHelpers {
         };
 
         Path goodsPath = Paths.get(path, "common", "goods.txt");
-        Set<Product> products = new TreeSet<>();
+        if (!goodsPath.toFile().isFile()) {
+            return products;
+        }
+
         GenericObject root = EUGFileIO.load(goodsPath.toFile());
 
         if (root != null) {

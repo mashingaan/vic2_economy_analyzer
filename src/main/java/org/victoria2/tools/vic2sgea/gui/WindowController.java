@@ -15,6 +15,7 @@ import javafx.scene.layout.Pane;
 import javafx.stage.FileChooser;
 import javafx.util.StringConverter;
 import org.victoria2.tools.vic2sgea.entities.Country;
+import org.victoria2.tools.vic2sgea.main.LoadRequestValidator;
 import org.victoria2.tools.vic2sgea.main.PathKeeper;
 import org.victoria2.tools.vic2sgea.main.Report;
 import org.victoria2.tools.vic2sgea.main.TableRowDoubleClickFactory;
@@ -23,7 +24,9 @@ import org.victoria2.tools.vic2sgea.watcher.Watch;
 import org.victoria2.tools.vic2sgea.watcher.WatchUtil;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.net.URL;
+import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.ResourceBundle;
@@ -202,6 +205,16 @@ public class WindowController extends BaseController implements Initializable {
     }
 
     public void onLoad() {
+        Path savePath = fpSaveGame.getPath();
+        Path gamePath = fpGamePath.getPath();
+        Path modPath = LoadRequestValidator.normalizeOptionalPath(fpModPath.getPath());
+
+        try {
+            LoadRequestValidator.validate(savePath, gamePath, modPath);
+        } catch (IllegalArgumentException e) {
+            errorAlert(e.getMessage());
+            return;
+        }
 
         //Main.hideProductList();
         setInterfaceEnabled(false);
@@ -216,13 +229,9 @@ public class WindowController extends BaseController implements Initializable {
                 //float startTime=0;
 
                 try {
-                    Path savePath = fpSaveGame.getPath();
-                    Path modPath = fpModPath.getPath();
-                    Path gamePath = fpGamePath.getPath();
-
                     PathKeeper.save(savePath, gamePath, modPath);
 
-                    report = new Report(savePath.toString(), gamePath != null ? gamePath.toString() : null, modPath != null ? modPath.toString() : null);
+                    report = new Report(savePath.toString(), gamePath.toString(), modPath != null ? modPath.toString() : null);
 
                     countryTableContent.setAll(report.getCountryList());
                     productListController.setReport(report);
@@ -233,7 +242,7 @@ public class WindowController extends BaseController implements Initializable {
 
                 } catch (Exception e) {
                     e.printStackTrace();
-                    errorAlert(e, "Exception while loading savegame");
+                    errorAlert(e, getLoadErrorMessage(e));
                 } finally {
                     Platform.runLater(() -> setInterfaceEnabled(true));
                 }
@@ -245,6 +254,18 @@ public class WindowController extends BaseController implements Initializable {
         Thread th = new Thread(task);
         th.start();
 
+    }
+
+    private static String getLoadErrorMessage(Exception e) {
+        if (e instanceof FileNotFoundException) {
+            return "Could not open the selected savegame file. Check the Savegame path and file permissions.";
+        }
+
+        if (e instanceof InvalidPathException) {
+            return "One of the selected paths is invalid. Please reselect Savegame, Game, and Mod paths.";
+        }
+
+        return "Could not load the selected savegame data. Please verify Savegame path, Game path, and optional Mod path.";
     }
 
     private void setLabels(Report report) {
