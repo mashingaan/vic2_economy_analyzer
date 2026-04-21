@@ -1,7 +1,11 @@
 package org.victoria2.tools.vic2sgea.watcher;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import org.victoria2.tools.vic2sgea.main.Report;
 
+import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 
@@ -19,5 +23,13 @@ public class WatchUtil {
             addState(watch, saveFile);
         }
         return watch;
+    }
+
+    public static Watch read(Path historyPath) throws IOException {
+        Gson gson = new GsonBuilder()
+                .addDeserializationExclusionStrategy(new NonSerializableExclusionStrategy())
+                .create();
+
+        return gson.fromJson(Files.newBufferedReader(historyPath), Watch.class);
     }
 }
