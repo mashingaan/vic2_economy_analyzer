@@ -34,9 +34,9 @@ public class Main extends Application {
         Properties props = new Properties();
 
         stage.setTitle("Victoria II SGEA v" + props.getVersion());
-        stage.setScene(new Scene(root));
-        //stage.setMinWidth(700);
-        //stage.setMinHeight(500);
+        stage.setScene(new Scene(root, 1100, 700));
+        stage.setMinWidth(900);
+        stage.setMinHeight(600);
         stage.show();
         stage.getIcons().add(new Image("/flags/EST.png")); /* Cause I'm Estonian, thats why */
 

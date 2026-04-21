@@ -3,7 +3,8 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 <?import org.victoria2.tools.vic2sgea.gui.FilePrompt?>
-<VBox id="idControl" xmlns="http://javafx.com/javafx/8.0.111"
+<VBox id="idControl" prefWidth="1100.0" prefHeight="700.0" minWidth="900.0" minHeight="600.0"
+      xmlns="http://javafx.com/javafx/8.0.111"
       xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.victoria2.tools.vic2sgea.gui.WindowController">
     <MenuBar>
         <Menu text="File">
@@ -24,10 +25,19 @@
     </MenuBar>
 
     <AnchorPane VBox.vgrow="ALWAYS">
-        <VBox spacing="10" AnchorPane.bottomAnchor="14" AnchorPane.leftAnchor="14"
+        <VBox spacing="10" fillWidth="true" minWidth="-Infinity" AnchorPane.bottomAnchor="14" AnchorPane.leftAnchor="14"
               AnchorPane.rightAnchor="14" AnchorPane.topAnchor="14">
 
             <GridPane fx:id="headerPane" hgap="5" vgap="5">
+                <columnConstraints>
+                    <ColumnConstraints minWidth="90.0" prefWidth="90.0" hgrow="NEVER" halignment="LEFT"/>
+                    <ColumnConstraints minWidth="300.0" prefWidth="600.0" hgrow="ALWAYS" fillWidth="true"/>
+                </columnConstraints>
+                <rowConstraints>
+                    <RowConstraints minHeight="-Infinity" vgrow="NEVER"/>
+                    <RowConstraints minHeight="-Infinity" vgrow="NEVER"/>
+                    <RowConstraints minHeight="-Infinity" vgrow="NEVER"/>
+                </rowConstraints>
 
                 <FilePrompt labelText="Savegame path" fx:id="fpSaveGame" promptType="FILE"
                             GridPane.rowIndex="0" GridPane.columnIndex="1"
@@ -53,6 +63,10 @@
             </GridPane>
 
             <GridPane vgap="5" minHeight="0" maxWidth="Infinity">
+                <columnConstraints>
+                    <ColumnConstraints hgrow="ALWAYS"/>
+                    <ColumnConstraints hgrow="NEVER" halignment="RIGHT"/>
+                </columnConstraints>
                 <Label fx:id="lblStartDate" GridPane.columnIndex="0" GridPane.rowIndex="0"
                        GridPane.hgrow="ALWAYS"/>
                 <Label fx:id="lblCurrentDate" GridPane.columnIndex="0" GridPane.rowIndex="1"

@@ -38,6 +38,9 @@ public class FilePrompt extends HBox {
         super(5.);
         getChildren().addAll(label, pathField, browseButton);
         setHgrow(pathField, Priority.ALWAYS);
+        pathField.setPrefColumnCount(35);
+        setMinWidth(280.);
+        setPrefWidth(480.);
         label.setPrefWidth(100.);
 
         labelWidth.addListener((observable, oldValue, newValue) -> label.setPrefWidth((Double) newValue));
